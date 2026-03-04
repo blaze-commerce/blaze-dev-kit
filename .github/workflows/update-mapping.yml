@@ -1,0 +1,107 @@
+name: Update File Mapping
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/**'
+      - 'docs/**'
+      - 'qa/**'
+      - 'scripts/**'
+      - 'eval/**'
+      - '.github/**'
+
+permissions:
+  contents: write
+
+jobs:
+  update-mapping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate file mapping
+        run: |
+          cat > FILE_MAPPING_GENERATED.md << 'HEADER'
+          # File Mapping - Blaze Dev Kit
+
+          > **Single Source of Truth** - Auto-updated by GitHub Actions on every merge to `main`.
+          HEADER
+
+          echo "> Last updated: $(date -u +%Y-%m-%d) | Version: $(cat VERSION | tr -d '[:space:]')" >> FILE_MAPPING_GENERATED.md
+          echo "" >> FILE_MAPPING_GENERATED.md
+
+          # Deploy files
+          echo "## [DEPLOY] Files" >> FILE_MAPPING_GENERATED.md
+          echo "" >> FILE_MAPPING_GENERATED.md
+          echo "| File | Type |" >> FILE_MAPPING_GENERATED.md
+          echo "|------|------|" >> FILE_MAPPING_GENERATED.md
+          find deploy/ -type f ! -name '.DS_Store' | sort | while read -r file; do
+            EXT="${file##*.}"
+            echo "| \`$file\` | $EXT |" >> FILE_MAPPING_GENERATED.md
+          done
+          echo "" >> FILE_MAPPING_GENERATED.md
+
+          # Docs files
+          echo "## [DOCS] Files" >> FILE_MAPPING_GENERATED.md
+          echo "" >> FILE_MAPPING_GENERATED.md
+          echo "| File | Type |" >> FILE_MAPPING_GENERATED.md
+          echo "|------|------|" >> FILE_MAPPING_GENERATED.md
+          find docs/ -type f ! -name '.DS_Store' ! -path '*/site/*' ! -path '*/node_modules/*' | sort | while read -r file; do
+            EXT="${file##*.}"
+            echo "| \`$file\` | $EXT |" >> FILE_MAPPING_GENERATED.md
+          done
+          echo "" >> FILE_MAPPING_GENERATED.md
+
+          # QA files
+          echo "## [QA] Files" >> FILE_MAPPING_GENERATED.md
+          echo "" >> FILE_MAPPING_GENERATED.md
+          echo "| File | Type |" >> FILE_MAPPING_GENERATED.md
+          echo "|------|------|" >> FILE_MAPPING_GENERATED.md
+          find qa/ -type f ! -name '.DS_Store' 2>/dev/null | sort | while read -r file; do
+            EXT="${file##*.}"
+            echo "| \`$file\` | $EXT |" >> FILE_MAPPING_GENERATED.md
+          done
+          echo "" >> FILE_MAPPING_GENERATED.md
+
+          # Repo files
+          echo "## [REPO] Files" >> FILE_MAPPING_GENERATED.md
+          echo "" >> FILE_MAPPING_GENERATED.md
+          echo "| File | Type |" >> FILE_MAPPING_GENERATED.md
+          echo "|------|------|" >> FILE_MAPPING_GENERATED.md
+          for f in README.md FILE_MAPPING.md VERSION CHANGELOG.md CONTRIBUTING.md LICENSE .gitignore; do
+            if [[ -f "$f" ]]; then
+              EXT="${f##*.}"
+              echo "| \`$f\` | $EXT |" >> FILE_MAPPING_GENERATED.md
+            fi
+          done
+          find .github/ scripts/ eval/ -type f ! -name '.DS_Store' 2>/dev/null | sort | while read -r file; do
+            EXT="${file##*.}"
+            echo "| \`$file\` | $EXT |" >> FILE_MAPPING_GENERATED.md
+          done
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if ! diff -q FILE_MAPPING.md FILE_MAPPING_GENERATED.md > /dev/null 2>&1; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update FILE_MAPPING.md
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          mv FILE_MAPPING_GENERATED.md FILE_MAPPING.md
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add FILE_MAPPING.md
+          git commit -m "chore: auto-update FILE_MAPPING.md"
+          git push
+
+      - name: Clean up
+        if: steps.diff.outputs.changed == 'false'
+        run: rm -f FILE_MAPPING_GENERATED.md

@@ -1,0 +1,25 @@
+{
+  "name": "PageSpeed Performance Optimization",
+  "skills": ["wordpress-router", "wp-performance"],
+  "command": "/pagespeed",
+  "query": "/pagespeed https://example.com",
+  "expected_behavior": [
+    "Step 1: Run 5 PageSpeed Insights tests via pagespeed.sh",
+    "Step 2: Analyze averaged results and identify failing audits",
+    "Step 3: If score >= 90, report success and exit",
+    "Step 4: Prioritize fixes by impact (LCP > TBT > CLS > FCP)",
+    "Step 5: Implement highest-impact fix",
+    "Step 6: Clear cache via clear-cache.sh",
+    "Step 7: Wait for CDN propagation",
+    "Step 8: Re-test with 5 runs",
+    "Step 9: Repeat until score >= 90 or max 5 rounds"
+  ],
+  "success_criteria": [
+    "Uses pagespeed.sh for testing (not manual curl)",
+    "Implements fixes in priority order",
+    "Clears cache after each change",
+    "Does not exceed 5 optimization rounds",
+    "Reports before/after scores",
+    "Documents changes in CHANGELOG.md"
+  ]
+}

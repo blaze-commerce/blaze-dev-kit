@@ -1,0 +1,103 @@
+name: Verify PR
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  verify-file-placement:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check file placement
+        run: |
+          echo "Verifying file placement rules..."
+          ERRORS=0
+
+          # Get list of changed files in this PR
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+
+          # Allowed root files
+          ALLOWED_ROOT="README.md|FILE_MAPPING.md|VERSION|CHANGELOG.md|CONTRIBUTING.md|LICENSE|\.gitignore"
+
+          for file in $CHANGED_FILES; do
+            # Skip deleted files
+            if [[ ! -f "$file" ]]; then
+              continue
+            fi
+
+            # Check if file is in an allowed location
+            if [[ "$file" =~ ^deploy/ ]]; then
+              continue  # Deploy files OK
+            elif [[ "$file" =~ ^docs/ ]]; then
+              continue  # Docs files OK
+            elif [[ "$file" =~ ^qa/ ]]; then
+              continue  # QA files OK
+            elif [[ "$file" =~ ^scripts/ ]]; then
+              continue  # Repo scripts OK
+            elif [[ "$file" =~ ^eval/ ]]; then
+              continue  # Eval scenarios OK
+            elif [[ "$file" =~ ^\.github/ ]]; then
+              continue  # GitHub config OK
+            elif [[ "$file" =~ ^($ALLOWED_ROOT)$ ]]; then
+              continue  # Allowed root files OK
+            else
+              echo "ERROR: File '$file' is not in an allowed location."
+              echo "  Files must be in: deploy/, docs/, qa/, scripts/, eval/, .github/, or be an allowed root file."
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          if [[ "$ERRORS" -gt 0 ]]; then
+            echo ""
+            echo "Found $ERRORS file(s) in unauthorized locations."
+            echo "Please move them to the correct directory. See FILE_MAPPING.md for guidance."
+            exit 1
+          fi
+
+          echo "All files are in authorized locations."
+
+  verify-deploy-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check deploy directory structure
+        run: |
+          echo "Verifying deploy/ structure..."
+          ERRORS=0
+
+          # Required files
+          REQUIRED=(
+            "deploy/VERSION"
+            "deploy/.claude/settings.json"
+            "deploy/.claude/hooks/PreToolUse/block-dangerous-commands.sh"
+            "deploy/.claude/hooks/PreToolUse/block-protected-files.sh"
+            "deploy/.claude/commands/init.md"
+            "deploy/.claude/commands/wpm.md"
+          )
+
+          for required in "${REQUIRED[@]}"; do
+            if [[ ! -f "$required" ]]; then
+              echo "ERROR: Required file missing: $required"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          # Check no docs/qa files accidentally in deploy/
+          if find deploy/ -name "*.test.*" -o -name "*.spec.*" -o -name "playwright*" | grep -q .; then
+            echo "ERROR: Test files found in deploy/ directory"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if [[ "$ERRORS" -gt 0 ]]; then
+            echo "Found $ERRORS issue(s) with deploy/ structure"
+            exit 1
+          fi
+
+          echo "Deploy structure is valid."

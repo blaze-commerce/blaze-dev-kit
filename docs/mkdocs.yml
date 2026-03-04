@@ -1,0 +1,151 @@
+site_name: Blaze Dev Kit
+site_url: https://blaze-commerce.github.io/blaze-dev-kit/
+site_description: AI-powered WordPress development toolkit for Kinsta-hosted sites
+site_author: Blaze Commerce
+
+repo_name: bc/blaze-dev-kit
+repo_url: https://github.com/blaze-commerce/blaze-dev-kit
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  favicon: assets/favicon.png
+  logo: assets/logo.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - navigation.footer
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+      fallback_to_build_date: true
+  - git-committers:
+      repository: blaze-commerce/blaze-dev-kit
+      branch: main
+      token: !ENV ["MKDOCS_GIT_COMMITTERS_APIKEY", ""]
+      enabled: !ENV [CI, false]
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+copyright: Copyright &copy; 2026 Blaze Commerce
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/blaze-commerce
+      name: Blaze Commerce on GitHub
+    - icon: fontawesome/brands/wordpress
+      link: https://blazecommerce.io
+      name: Blaze Commerce Website
+  generator: true
+  version:
+    provider: mike
+
+extra_css:
+  - assets/extra.css
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/index.md
+    - Installation: getting-started/installation.md
+    - Initialization: getting-started/initialization.md
+    - Requirements: getting-started/requirements.md
+  - Services:
+    - services/index.md
+    - WordPress Maintenance: services/wpm.md
+    - Site Optimization: services/optimization.md
+    - Web Development: services/development.md
+    - SEO & Marketing: services/seo-marketing.md
+  - Workflows:
+    - workflows/index.md
+    - Developer Setup: workflows/dev-setup.md
+    - Updating Sites: workflows/updating.md
+    - Contributing: workflows/contributing.md
+    - Releasing: workflows/releasing.md
+    - GitHub Pages: workflows/github-pages.md
+    - Migration Guide: workflows/migration.md
+  - Reference:
+    - reference/index.md
+    - Commands: reference/commands.md
+    - Skills: reference/skills.md
+    - Agents: reference/agents.md
+    - Scripts: reference/scripts.md
+    - File Mapping: reference/file-mapping.md
+  - Roadmap: roadmap/index.md
+  - FAQ: faq/index.md
+
+# Page icons via meta in each .md file (icon: frontmatter)
+# Nav icons via theme icon overrides are not natively supported,
+# so we use page-level frontmatter icons instead.

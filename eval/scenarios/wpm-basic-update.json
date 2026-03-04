@@ -1,0 +1,26 @@
+{
+  "name": "WPM Basic Maintenance Update",
+  "skills": ["wordpress-router", "wordpress-master"],
+  "command": "/wpm",
+  "query": "Run WordPress maintenance updates on this site",
+  "expected_behavior": [
+    "Step 1: Check current WordPress version and plugin status",
+    "Step 2: Enable maintenance mode (WooCommerce > ASE Pro > .maintenance fallback)",
+    "Step 3: Update WordPress core",
+    "Step 4: Run database updates",
+    "Step 5: Update free plugins (excluding premium list)",
+    "Step 6: Update premium plugins via update-premium-plugins.sh",
+    "Step 7: Update themes",
+    "Step 8: Disable maintenance mode",
+    "Step 9: Verify site is accessible",
+    "Step 10: Update CLAUDE.md plugin inventory",
+    "Step 11: Document changes in CHANGELOG.md"
+  ],
+  "success_criteria": [
+    "Maintenance mode enabled before any updates",
+    "Premium plugins excluded from bulk update",
+    "Maintenance mode disabled after updates",
+    "Site accessibility verified post-update",
+    "CHANGELOG.md updated with changes"
+  ]
+}

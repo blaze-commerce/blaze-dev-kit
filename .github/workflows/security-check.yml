@@ -1,0 +1,96 @@
+name: Security Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_call:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan for hardcoded secrets
+        run: |
+          echo "Scanning for hardcoded secrets..."
+          FOUND=0
+
+          # AWS keys
+          if grep -rn 'AKIA[0-9A-Z]\{16\}' --include="*.sh" --include="*.md" --include="*.json" --include="*.yml" deploy/ docs/ scripts/; then
+            echo "ERROR: AWS access key found"
+            FOUND=1
+          fi
+
+          # Generic API keys/tokens
+          if grep -rn 'sk-[a-zA-Z0-9]\{20,\}' --include="*.sh" --include="*.md" --include="*.json" deploy/ scripts/; then
+            echo "ERROR: Possible API key found"
+            FOUND=1
+          fi
+
+          # Private keys
+          if grep -rn 'BEGIN.*PRIVATE KEY' deploy/ docs/ scripts/; then
+            echo "ERROR: Private key found"
+            FOUND=1
+          fi
+
+          # Passwords in plaintext
+          if grep -rn 'password\s*=\s*["\x27][^"\x27]\{8,\}' --include="*.sh" --include="*.json" deploy/ scripts/; then
+            echo "ERROR: Possible hardcoded password found"
+            FOUND=1
+          fi
+
+          if [[ "$FOUND" -eq 1 ]]; then
+            exit 1
+          fi
+
+          echo "No secrets found."
+
+      - name: Scan for localhost URLs in deploy files
+        run: |
+          echo "Scanning for localhost URLs..."
+          if grep -rn 'localhost\|127\.0\.0\.1\|0\.0\.0\.0' --include="*.sh" --include="*.json" deploy/.claude/; then
+            echo "WARNING: Localhost URLs found in deploy files (may be intentional for development)"
+          fi
+          echo "Scan complete."
+
+      - name: Validate shell scripts
+        run: |
+          echo "Validating shell scripts..."
+          ERRORS=0
+
+          for script in $(find deploy/ scripts/ -name "*.sh" -type f); do
+            if ! bash -n "$script" 2>&1; then
+              echo "ERROR: Syntax error in $script"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          if [[ "$ERRORS" -gt 0 ]]; then
+            echo "Found $ERRORS script(s) with syntax errors"
+            exit 1
+          fi
+
+          echo "All shell scripts pass syntax check."
+
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON files..."
+          ERRORS=0
+
+          for json in $(find deploy/ -name "*.json" -type f); do
+            if ! python3 -m json.tool "$json" > /dev/null 2>&1; then
+              echo "ERROR: Invalid JSON in $json"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          if [[ "$ERRORS" -gt 0 ]]; then
+            echo "Found $ERRORS invalid JSON file(s)"
+            exit 1
+          fi
+
+          echo "All JSON files are valid."

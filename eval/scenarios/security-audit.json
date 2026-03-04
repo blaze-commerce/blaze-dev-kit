@@ -1,0 +1,24 @@
+{
+  "name": "Security Audit",
+  "skills": ["wordpress-router", "security-auditor"],
+  "command": null,
+  "query": "Run a security audit on the custom code in this site",
+  "expected_behavior": [
+    "Step 1: Router identifies this as a security task",
+    "Step 2: Load security-auditor skill",
+    "Step 3: Scan child theme for SQL injection (raw $wpdb without prepare)",
+    "Step 4: Scan for XSS (unescaped output)",
+    "Step 5: Check for CSRF (forms without nonces)",
+    "Step 6: Verify capability checks on admin functions",
+    "Step 7: Check file permissions",
+    "Step 8: Report findings with severity levels",
+    "Step 9: Provide fix recommendations"
+  ],
+  "success_criteria": [
+    "Uses security-auditor skill (not generic WordPress skill)",
+    "Checks all OWASP top categories",
+    "Does not modify files without approval for Critical/High findings",
+    "Provides severity ratings",
+    "Includes specific fix code snippets"
+  ]
+}

@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  security-check:
+    uses: ./.github/workflows/security-check.yml
+
+  build-and-release:
+    needs: security-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify version files match tag
+        run: |
+          REPO_VERSION=$(cat VERSION | tr -d '[:space:]')
+          DEPLOY_VERSION=$(cat deploy/VERSION | tr -d '[:space:]')
+          TAG_VERSION="${{ steps.version.outputs.VERSION }}"
+
+          if [[ "$REPO_VERSION" != "$TAG_VERSION" ]]; then
+            echo "ERROR: VERSION file ($REPO_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+
+          if [[ "$DEPLOY_VERSION" != "$TAG_VERSION" ]]; then
+            echo "ERROR: deploy/VERSION ($DEPLOY_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+
+      - name: Build deploy zip
+        run: |
+          cd deploy
+          zip -r "../blaze-dev-kit-${{ steps.version.outputs.VERSION }}.zip" \
+            .claude/ \
+            VERSION \
+            -x "*.DS_Store" \
+            -x "*__MACOSX*"
+
+      - name: Verify deploy zip
+        run: |
+          ./scripts/verify-deploy-zip.sh "blaze-dev-kit-${{ steps.version.outputs.VERSION }}.zip"
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          # Extract the section for this version from CHANGELOG.md
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          NOTES=$(sed -n "/## \[${VERSION}\]/,/## \[v/p" CHANGELOG.md | head -n -1)
+          if [[ -z "$NOTES" ]]; then
+            NOTES="Release ${VERSION}"
+          fi
+          echo "NOTES<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$NOTES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Blaze Dev Kit ${{ steps.version.outputs.VERSION }}"
+          body: ${{ steps.changelog.outputs.NOTES }}
+          files: "blaze-dev-kit-${{ steps.version.outputs.VERSION }}.zip"
+          draft: false
+          prerelease: false

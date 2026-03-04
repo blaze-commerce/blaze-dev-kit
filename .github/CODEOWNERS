@@ -1,0 +1,11 @@
+# Blaze Dev Kit - Code Owners
+# All changes require approval from at least one maintainer.
+
+# Global - all files
+* @jarutosurano @jaborjkath
+
+# Deploy files are critical - both maintainers should review
+/deploy/ @jarutosurano @jaborjkath
+
+# GitHub Actions workflows
+/.github/ @jarutosurano @jaborjkath

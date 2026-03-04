@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (docs build)
+node_modules/
+docs/site/
+
+# Python (mkdocs)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Test artifacts
+qa/sites/*/screenshots/
+qa/sites/*/results/
+lighthouse-reports/
+
+# Build artifacts
+dist/
+*.zip
+
+# Backup files
+*.bak
+*.backup
