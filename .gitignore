@@ -38,3 +38,6 @@ dist/
 # Backup files
 *.bak
 *.backup
+
+# Temporary screenshots
+screenshots/
