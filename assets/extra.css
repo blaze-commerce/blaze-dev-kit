@@ -1,0 +1,158 @@
+/* Blaze Commerce - Custom styles for Blaze Dev Kit docs */
+
+:root {
+  --md-primary-fg-color: #E64A19;
+  --md-primary-fg-color--light: #FF6E40;
+  --md-primary-fg-color--dark: #BF360C;
+}
+
+/* Header: black background in light mode */
+[data-md-color-scheme="default"] .md-header {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Header: white background in dark mode */
+[data-md-color-scheme="slate"] .md-header {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Ensure header links/icons follow the text color */
+[data-md-color-scheme="slate"] .md-header .md-header__button,
+[data-md-color-scheme="slate"] .md-header .md-header__topic,
+[data-md-color-scheme="slate"] .md-header .md-header__title,
+[data-md-color-scheme="slate"] .md-header a {
+  color: #000000;
+}
+
+/* Tab bar inherits header colors */
+[data-md-color-scheme="default"] .md-tabs {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+[data-md-color-scheme="slate"] .md-tabs .md-tabs__link {
+  color: #000000;
+  opacity: 0.7;
+}
+
+[data-md-color-scheme="slate"] .md-tabs .md-tabs__link--active,
+[data-md-color-scheme="slate"] .md-tabs .md-tabs__link:hover {
+  color: #000000;
+  opacity: 1;
+}
+
+/* Search bar text in dark-mode header */
+[data-md-color-scheme="slate"] .md-search__input {
+  color: #000000;
+}
+
+/* Footer: orange background for both modes */
+.md-footer {
+  background-color: #E64A19;
+  color: #ffffff;
+}
+
+.md-footer-meta {
+  background-color: #BF360C;
+}
+
+.md-footer a {
+  color: #ffffff;
+}
+
+.md-footer a:hover {
+  color: #FFE0B2;
+}
+
+/* Previous/Next nav in footer */
+.md-footer__link {
+  color: #ffffff;
+}
+
+.md-footer__title {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.md-footer__direction {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.md-footer__button {
+  color: #ffffff;
+}
+
+/* Copyright text in footer */
+.md-copyright {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.md-copyright a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.md-copyright a:hover {
+  color: #ffffff;
+}
+
+/* Social links in footer */
+.md-social__link {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.md-social__link:hover {
+  color: #ffffff;
+}
+
+/* Spacing: gap between header/tabs and content */
+.md-main {
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+/* Hero section styling */
+.md-typeset .hero {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.md-typeset .hero h1 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* Version badge */
+.md-typeset .version-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--md-primary-fg-color);
+  color: white;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Service cards */
+.md-typeset .grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.md-typeset .grid-cards .card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s;
+}
+
+.md-typeset .grid-cards .card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
